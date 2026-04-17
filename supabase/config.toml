@@ -1,0 +1,5 @@
+[functions.monitor-ingest]
+verify_jwt = false
+
+[functions.monitor-fetch]
+verify_jwt = false
