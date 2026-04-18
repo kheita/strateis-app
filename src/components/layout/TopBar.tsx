@@ -17,6 +17,12 @@ const HEALTH_LABEL: Record<SourceStatus, string> = {
   down: "Source(s) indisponible(s)",
 };
 
+const HEALTH_SHORT: Record<SourceStatus, string> = {
+  ok: "stable",
+  stale: "dégradé",
+  down: "incident",
+};
+
 const HEALTH_DOT: Record<SourceStatus, string> = {
   ok: "bg-status-ok",
   stale: "bg-status-warn",
@@ -81,7 +87,7 @@ export function TopBar() {
               <span className={cn("relative h-1.5 w-1.5 rounded-full", HEALTH_DOT[overallHealth])} />
             </span>
             <span className={cn("hidden font-mono text-[10.5px] uppercase tracking-[0.14em] sm:inline", HEALTH_TEXT[overallHealth])}>
-              {overallHealth === "ok" ? "stable" : overallHealth === "stale" ? "alerte" : "incident"}
+              {HEALTH_SHORT[overallHealth]}
             </span>
           </button>
           <StatusPanel

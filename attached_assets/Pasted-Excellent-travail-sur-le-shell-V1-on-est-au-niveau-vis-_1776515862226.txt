@@ -1,0 +1,32 @@
+Excellent travail sur le shell V1, on est au niveau visé. Avant de passer aux vrais modules, trois ajustements à faire pour finaliser le shell :
+
+1. INDICATEUR DE SANTÉ GLOBAL DANS LA TOPBAR (priorité haute)
+
+Actuellement, la TopBar affiche "● INCIDENT" en rouge en permanence, alors que le Statut système montre 6 stables / 1 obsolète / 1 indisponible (données mockées). Cette incohérence casse la crédibilité du système de monitoring.
+
+Logique à implémenter :
+- Si 100% des sources sont Stables → afficher "● STABLE" en vert
+- Si au moins une source est Obsolète (et aucune Indisponible) → afficher "● DÉGRADÉ" en orange/amber
+- Si au moins une source est Indisponible → afficher "● INCIDENT" en rouge
+
+L'indicateur doit se mettre à jour dynamiquement en fonction des données mockées actuelles. Avec les mocks existants (1 Indisponible), l'indicateur devrait donc afficher "● INCIDENT" — mais la logique doit être vraiment liée aux données, pas hardcodée.
+
+Le clic sur cet indicateur ouvre le Statut système (comportement actuel OK).
+
+2. BOUTON "STATUT SYSTÈME" DANS LE FOOTER DE LA SIDEBAR (priorité haute)
+
+Actuellement, cliquer sur "Statut système" dans le footer de la sidebar ouvre une petite fenêtre qui affiche juste le titre "Statut système" sans contenu. C'est un bug.
+
+Ce bouton doit ouvrir exactement le même panneau que l'indicateur de santé global de la TopBar (celui qui liste les 8 sources avec leurs statuts, fréquences, uptimes, etc.).
+
+3. TOOLTIPS SUR LES ICÔNES DE LA SIDEBAR REPLIÉE (priorité moyenne)
+
+Quand la sidebar est repliée en mode icônes seules (via ⌘\ ou le bouton "Réduire le menu"), il faudrait un tooltip au hover sur chaque icône de module, affichant le nom du module. Sans ça, il faut deviner les modules par leurs icônes.
+
+Délai tooltip : 350-500ms. Style : cohérent avec le reste du design system. Positionnement : à droite de l'icône.
+
+---
+
+Note : le toggle dark/light fonctionne bien, le responsive mobile est propre, la Command Palette ⌘K marche parfaitement, la persistance des sections collapsées en localStorage est bonne. Tout le reste du shell est validé.
+
+Une fois ces 3 points corrigés, on passe au premier vrai module : Dashboard Intelligence.

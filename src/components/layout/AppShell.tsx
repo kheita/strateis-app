@@ -14,7 +14,7 @@ export function AppShell() {
   const { collapsed, toggle: toggleCollapse } = useSidebarCollapse();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileStatusOpen, setMobileStatusOpen] = useState(false);
+  const [sheetStatusOpen, setSheetStatusOpen] = useState(false);
   const { openPalette } = useCommandPalette();
 
   // Update document title from current module
@@ -35,7 +35,7 @@ export function AppShell() {
         <Sidebar
           collapsed={collapsed}
           onToggleCollapse={toggleCollapse}
-          onOpenStatus={() => setMobileStatusOpen(true)}
+          onOpenStatus={() => setSheetStatusOpen(true)}
         />
       </div>
 
@@ -45,18 +45,17 @@ export function AppShell() {
         onClose={() => setMobileOpen(false)}
         onOpenStatus={() => {
           setMobileOpen(false);
-          setMobileStatusOpen(true);
+          setSheetStatusOpen(true);
         }}
       />
 
-      {/* Mobile-only status sheet (desktop has its own dropdown in TopBar) */}
-      <div className="md:hidden">
-        <StatusPanel
-          open={mobileStatusOpen}
-          onClose={() => setMobileStatusOpen(false)}
-          mode="sheet"
-        />
-      </div>
+      {/* Status sheet — opens when triggered from sidebar (any breakpoint) or mobile drawer.
+          The TopBar indicator on desktop has its own dropdown. */}
+      <StatusPanel
+        open={sheetStatusOpen}
+        onClose={() => setSheetStatusOpen(false)}
+        mode="sheet"
+      />
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top utility bar */}
