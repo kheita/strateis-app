@@ -1,13 +1,45 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { CommandPaletteProvider } from "./contexts/CommandPaletteContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { AppShell } from "./components/layout/AppShell";
+import { CommandPalette } from "./components/palette/CommandPalette";
+import { LoginPage } from "./pages/LoginPage";
+import { ModulePlaceholder } from "./pages/ModulePlaceholder";
+import { ALL_MODULES } from "./config/navigation";
+
 function App() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center">
-      <div className="text-center px-6">
-        <h1 className="text-4xl font-semibold tracking-tight">Strateis App</h1>
-        <p className="mt-3 text-neutral-400">
-          Backend foundations ready — frontend built by Replit Agent.
-        </p>
-      </div>
-    </div>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <CommandPaletteProvider>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppShell />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/intelligence/dashboard" replace />} />
+                {ALL_MODULES.map((m) => (
+                  <Route
+                    key={m.id}
+                    path={m.path}
+                    element={<ModulePlaceholder moduleId={m.id} />}
+                  />
+                ))}
+                <Route path="*" element={<Navigate to="/intelligence/dashboard" replace />} />
+              </Route>
+            </Routes>
+            <CommandPalette />
+          </CommandPaletteProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

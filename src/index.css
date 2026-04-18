@@ -1,3 +1,207 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-app: 248 249 252;
+    --bg-surface: 255 255 255;
+    --bg-elevated: 255 255 255;
+    --bg-subtle: 244 246 250;
+    --bg-hover: 238 241 247;
+    --bg-active: 230 234 243;
+
+    --border-subtle: 228 231 240;
+    --border-default: 215 220 232;
+    --border-strong: 195 202 218;
+
+    --text-primary: 14 20 40;
+    --text-secondary: 77 88 118;
+    --text-tertiary: 120 132 161;
+    --text-muted: 168 177 199;
+    --text-on-gold: 14 20 40;
+
+    --accent-gold: 212 168 83;
+    --accent-gold-soft: 244 229 190;
+
+    --status-ok: 22 163 110;
+    --status-warn: 217 156 38;
+    --status-down: 217 70 70;
+    --status-info: 80 130 220;
+  }
+
+  html.dark {
+    --bg-app: 7 11 23;
+    --bg-surface: 11 17 33;
+    --bg-elevated: 14 20 40;
+    --bg-subtle: 19 26 51;
+    --bg-hover: 27 34 64;
+    --bg-active: 44 53 82;
+
+    --border-subtle: 19 26 51;
+    --border-default: 27 34 64;
+    --border-strong: 44 53 82;
+
+    --text-primary: 238 241 247;
+    --text-secondary: 168 177 199;
+    --text-tertiary: 120 132 161;
+    --text-muted: 77 88 118;
+    --text-on-gold: 14 20 40;
+
+    --accent-gold: 212 168 83;
+    --accent-gold-soft: 74 56 25;
+
+    --status-ok: 52 199 145;
+    --status-warn: 224 187 94;
+    --status-down: 235 110 110;
+    --status-info: 120 160 230;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: rgb(var(--bg-app));
+    color: rgb(var(--text-primary));
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(212, 168, 83, 0.35);
+    color: rgb(var(--text-primary));
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgb(var(--accent-gold));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(120, 132, 161, 0.18);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 132, 161, 0.32);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+}
+
+@layer components {
+  .surface-app {
+    background-color: rgb(var(--bg-app));
+  }
+  .surface {
+    background-color: rgb(var(--bg-surface));
+  }
+  .surface-elevated {
+    background-color: rgb(var(--bg-elevated));
+  }
+  .surface-subtle {
+    background-color: rgb(var(--bg-subtle));
+  }
+  .surface-hover {
+    background-color: rgb(var(--bg-hover));
+  }
+  .border-subtle {
+    border-color: rgb(var(--border-subtle));
+  }
+  .border-default {
+    border-color: rgb(var(--border-default));
+  }
+  .border-strong {
+    border-color: rgb(var(--border-strong));
+  }
+  .text-primary {
+    color: rgb(var(--text-primary));
+  }
+  .text-secondary {
+    color: rgb(var(--text-secondary));
+  }
+  .text-tertiary {
+    color: rgb(var(--text-tertiary));
+  }
+  .text-muted {
+    color: rgb(var(--text-muted));
+  }
+  .text-gold {
+    color: rgb(var(--accent-gold));
+  }
+  .bg-gold {
+    background-color: rgb(var(--accent-gold));
+  }
+  .bg-gold-soft {
+    background-color: rgb(var(--accent-gold-soft));
+  }
+  .border-gold {
+    border-color: rgb(var(--accent-gold));
+  }
+
+  .status-ok {
+    color: rgb(var(--status-ok));
+  }
+  .status-warn {
+    color: rgb(var(--status-warn));
+  }
+  .status-down {
+    color: rgb(var(--status-down));
+  }
+  .bg-status-ok {
+    background-color: rgb(var(--status-ok));
+  }
+  .bg-status-warn {
+    background-color: rgb(var(--status-warn));
+  }
+  .bg-status-down {
+    background-color: rgb(var(--status-down));
+  }
+
+  .grid-bg {
+    background-image:
+      radial-gradient(
+        circle at 0% 0%,
+        rgba(212, 168, 83, 0.06) 0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 100% 100%,
+        rgba(80, 130, 220, 0.05) 0%,
+        transparent 50%
+      );
+  }
+
+  .label-mono {
+    @apply font-mono uppercase tracking-[0.14em] text-[10.5px] font-medium;
+    color: rgb(var(--text-tertiary));
+  }
+}
+
+@layer utilities {
+  .transition-base {
+    transition-property: background-color, border-color, color, fill, stroke,
+      opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+}

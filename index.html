@@ -1,10 +1,39 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>strateis-tmp</title>
+    <meta name="theme-color" content="#0B1121" />
+    <meta
+      name="description"
+      content="Strateis App — le cockpit digital du cabinet Strateis Partners. Intelligence, monitoring et opérations dans un seul outil."
+    />
+    <meta property="og:title" content="Strateis App" />
+    <meta
+      property="og:description"
+      content="Le cockpit digital de Strateis Partners — intelligence, monitoring et opérations."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>Strateis App</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("strateis-theme");
+          if (stored === "light") {
+            document.documentElement.classList.remove("dark");
+          } else {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
