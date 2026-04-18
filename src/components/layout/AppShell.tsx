@@ -8,13 +8,11 @@ import { useCommandPalette } from "../../contexts/CommandPaletteContext";
 import { findModuleByPath } from "../../config/navigation";
 import { cn } from "../../lib/cn";
 import { LogoMark } from "../brand/Logo";
-import { StatusPanel } from "../status/StatusPanel";
 
 export function AppShell() {
   const { collapsed, toggle: toggleCollapse } = useSidebarCollapse();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sheetStatusOpen, setSheetStatusOpen] = useState(false);
   const { openPalette } = useCommandPalette();
 
   // Update document title from current module
@@ -32,30 +30,11 @@ export function AppShell() {
     <div className="surface-app grid-bg flex h-screen w-screen overflow-hidden text-primary">
       {/* Desktop sidebar */}
       <div className="hidden md:flex">
-        <Sidebar
-          collapsed={collapsed}
-          onToggleCollapse={toggleCollapse}
-          onOpenStatus={() => setSheetStatusOpen(true)}
-        />
+        <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} />
       </div>
 
       {/* Mobile drawer */}
-      <MobileDrawer
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        onOpenStatus={() => {
-          setMobileOpen(false);
-          setSheetStatusOpen(true);
-        }}
-      />
-
-      {/* Status sheet — opens when triggered from sidebar (any breakpoint) or mobile drawer.
-          The TopBar indicator on desktop has its own dropdown. */}
-      <StatusPanel
-        open={sheetStatusOpen}
-        onClose={() => setSheetStatusOpen(false)}
-        mode="sheet"
-      />
+      <MobileDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top utility bar */}
@@ -96,11 +75,9 @@ export function AppShell() {
 function MobileDrawer({
   open,
   onClose,
-  onOpenStatus,
 }: {
   open: boolean;
   onClose: () => void;
-  onOpenStatus: () => void;
 }) {
   return (
     <>
@@ -126,7 +103,7 @@ function MobileDrawer({
           >
             <X size={13} strokeWidth={2} />
           </button>
-          <Sidebar collapsed={false} onToggleCollapse={() => {}} onOpenStatus={onOpenStatus} />
+          <Sidebar collapsed={false} onToggleCollapse={() => {}} />
         </div>
       </div>
     </>

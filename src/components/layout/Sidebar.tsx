@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { ChevronDown, ChevronsLeft, ChevronsRight, LogOut, Activity } from "lucide-react";
+import { ChevronDown, ChevronsLeft, ChevronsRight, LogOut, Settings } from "lucide-react";
 import { NAVIGATION, type NavSection, type NavModule } from "../../config/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 import { Logo, LogoMark } from "../brand/Logo";
@@ -12,10 +12,9 @@ import { cn } from "../../lib/cn";
 type Props = {
   collapsed: boolean;
   onToggleCollapse: () => void;
-  onOpenStatus: () => void;
 };
 
-export function Sidebar({ collapsed, onToggleCollapse, onOpenStatus }: Props) {
+export function Sidebar({ collapsed, onToggleCollapse }: Props) {
   return (
     <aside
       className={cn(
@@ -42,11 +41,7 @@ export function Sidebar({ collapsed, onToggleCollapse, onOpenStatus }: Props) {
         ))}
       </nav>
 
-      <SidebarFooter
-        collapsed={collapsed}
-        onToggleCollapse={onToggleCollapse}
-        onOpenStatus={onOpenStatus}
-      />
+      <SidebarFooter collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
     </aside>
   );
 }
@@ -158,33 +153,51 @@ function SidebarItem({ module, collapsed }: { module: NavModule; collapsed: bool
 function SidebarFooter({
   collapsed,
   onToggleCollapse,
-  onOpenStatus,
 }: {
   collapsed: boolean;
   onToggleCollapse: () => void;
-  onOpenStatus: () => void;
 }) {
   const { user, signOut } = useAuth();
   const email = user?.email ?? "";
   const initials = (email[0] ?? "?").toUpperCase();
   const name = email.split("@")[0]?.replace(/\./g, " ") ?? "Utilisateur";
 
+  const settingsLink = (
+    <NavLink
+      to="/settings"
+      className={({ isActive }) =>
+        cn(
+          "group flex w-full items-center gap-2.5 rounded-md text-[12px] transition-base no-tap-highlight",
+          collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-1.5",
+          isActive
+            ? "surface-hover text-primary"
+            : "text-secondary hover:surface-subtle hover:text-primary",
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Settings
+            size={14}
+            strokeWidth={1.6}
+            className={cn("shrink-0", isActive ? "text-gold" : "text-tertiary group-hover:text-secondary")}
+          />
+          {!collapsed && <span>Paramètres</span>}
+        </>
+      )}
+    </NavLink>
+  );
+
   return (
     <div className="border-subtle border-t px-2 py-2">
       <div className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
-        <Tooltip label="Statut système" side="right" shortcut="">
-          <button
-            type="button"
-            onClick={onOpenStatus}
-            className={cn(
-              "group hover:surface-subtle flex w-full items-center gap-2.5 rounded-md text-[12px] text-secondary transition-base hover:text-primary",
-              collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-1.5",
-            )}
-          >
-            <Activity size={14} strokeWidth={1.6} className="text-tertiary group-hover:status-ok shrink-0" />
-            {!collapsed && <span>Statut système</span>}
-          </button>
-        </Tooltip>
+        {collapsed ? (
+          <Tooltip label="Paramètres" side="right">
+            {settingsLink}
+          </Tooltip>
+        ) : (
+          settingsLink
+        )}
 
         <Tooltip label={collapsed ? "Déplier" : "Replier"} side="right" shortcut={`${getModKeyLabel()} \\`}>
           <button

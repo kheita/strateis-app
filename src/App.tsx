@@ -7,6 +7,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { CommandPalette } from "./components/palette/CommandPalette";
 import { LoginPage } from "./pages/LoginPage";
 import { ModulePlaceholder } from "./pages/ModulePlaceholder";
+import { SettingsPage } from "./pages/SettingsPage";
 import { ALL_MODULES } from "./config/navigation";
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
                     element={<ModulePlaceholder moduleId={m.id} />}
                   />
                 ))}
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<Navigate to="/intelligence/dashboard" replace />} />
               </Route>
             </Routes>

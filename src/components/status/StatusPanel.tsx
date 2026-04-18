@@ -4,14 +4,10 @@ import { Activity, RefreshCw, X } from "lucide-react";
 import { MONITORED_SOURCES, type MonitoredSource, type SourceStatus } from "../../config/sources";
 import { cn } from "../../lib/cn";
 
-type Mode = "dropdown" | "sheet";
-
 type Props = {
   open: boolean;
   onClose: () => void;
-  /** "dropdown" anchors below a topbar trigger; "sheet" is a centered modal for mobile. */
-  mode?: Mode;
-  /** Required only in dropdown mode: clicking the anchor itself shouldn't close the panel. */
+  /** Clicking the anchor itself shouldn't close the panel. */
   anchorRef?: React.RefObject<HTMLElement | null>;
 };
 
@@ -42,7 +38,7 @@ function relativeFr(min: number): string {
   return `il y a ${d} j`;
 }
 
-export function StatusPanel({ open, onClose, mode = "dropdown", anchorRef }: Props) {
+export function StatusPanel({ open, onClose, anchorRef }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,9 +50,8 @@ export function StatusPanel({ open, onClose, mode = "dropdown", anchorRef }: Pro
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Dropdown mode uses outside click detection (no backdrop).
   useEffect(() => {
-    if (!open || mode !== "dropdown") return;
+    if (!open) return;
     const onClick = (e: MouseEvent) => {
       const target = e.target as Node;
       if (panelRef.current?.contains(target)) return;
@@ -65,7 +60,7 @@ export function StatusPanel({ open, onClose, mode = "dropdown", anchorRef }: Pro
     };
     window.addEventListener("mousedown", onClick);
     return () => window.removeEventListener("mousedown", onClick);
-  }, [open, mode, onClose, anchorRef]);
+  }, [open, onClose, anchorRef]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, MonitoredSource[]>();
@@ -84,96 +79,6 @@ export function StatusPanel({ open, onClose, mode = "dropdown", anchorRef }: Pro
     return { ok, stale, down, total: MONITORED_SOURCES.length };
   }, []);
 
-  const card = (
-    <div className="surface-elevated border-default overflow-hidden rounded-xl border shadow-elev-3">
-      <div className="border-subtle flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <Activity size={14} className="text-gold" strokeWidth={1.75} />
-          <div>
-            <div className="text-[12.5px] font-medium text-primary">Statut système</div>
-            <div className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-tertiary">
-              Transparence radicale
-            </div>
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          aria-label="Fermer"
-          className="surface-subtle hover:surface-hover text-tertiary hover:text-primary rounded-md p-1 transition-base"
-        >
-          <X size={13} strokeWidth={2} />
-        </button>
-      </div>
-
-      <div className="border-subtle grid grid-cols-3 border-b">
-        <Counter label="Stables" value={counts.ok} variant="ok" />
-        <Counter label="Obsolètes" value={counts.stale} variant="stale" divider />
-        <Counter label="Indispo." value={counts.down} variant="down" divider />
-      </div>
-
-      <div className="max-h-[420px] overflow-y-auto">
-        {grouped.map(([category, sources]) => (
-          <div key={category}>
-            <div className="border-subtle surface-subtle/60 sticky top-0 z-[1] border-b px-4 py-1.5 backdrop-blur">
-              <div className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-tertiary">
-                {category}
-              </div>
-            </div>
-            {sources.map((src) => (
-              <SourceRow key={src.id} src={src} />
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <div className="border-subtle flex items-center justify-between border-t px-4 py-2.5">
-        <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-tertiary">
-          <RefreshCw size={10} strokeWidth={2} />
-          Mock · données simulées
-        </div>
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">v0.1</span>
-      </div>
-    </div>
-  );
-
-  if (mode === "sheet") {
-    return (
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            role="dialog"
-            aria-label="Statut système"
-          >
-            <div
-              className="absolute inset-0"
-              style={{
-                background: "rgba(6, 11, 20, 0.65)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-              }}
-              onClick={onClose}
-            />
-            <motion.div
-              ref={panelRef}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-10 w-full max-w-[420px] px-4 pb-4 sm:p-0"
-            >
-              {card}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    );
-  }
-
   return (
     <AnimatePresence>
       {open && (
@@ -187,7 +92,55 @@ export function StatusPanel({ open, onClose, mode = "dropdown", anchorRef }: Pro
           role="dialog"
           aria-label="Statut système"
         >
-          {card}
+          <div className="surface-elevated border-default overflow-hidden rounded-xl border shadow-elev-3">
+            <div className="border-subtle flex items-center justify-between border-b px-4 py-3">
+              <div className="flex items-center gap-2.5">
+                <Activity size={14} className="text-gold" strokeWidth={1.75} />
+                <div>
+                  <div className="text-[12.5px] font-medium text-primary">Statut système</div>
+                  <div className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-tertiary">
+                    Transparence radicale
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                aria-label="Fermer"
+                className="surface-subtle hover:surface-hover text-tertiary hover:text-primary rounded-md p-1 transition-base"
+              >
+                <X size={13} strokeWidth={2} />
+              </button>
+            </div>
+
+            <div className="border-subtle grid grid-cols-3 border-b">
+              <Counter label="Stables" value={counts.ok} variant="ok" />
+              <Counter label="Obsolètes" value={counts.stale} variant="stale" divider />
+              <Counter label="Indispo." value={counts.down} variant="down" divider />
+            </div>
+
+            <div className="max-h-[420px] overflow-y-auto">
+              {grouped.map(([category, sources]) => (
+                <div key={category}>
+                  <div className="border-subtle surface-subtle/60 sticky top-0 z-[1] border-b px-4 py-1.5 backdrop-blur">
+                    <div className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-tertiary">
+                      {category}
+                    </div>
+                  </div>
+                  {sources.map((src) => (
+                    <SourceRow key={src.id} src={src} />
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            <div className="border-subtle flex items-center justify-between border-t px-4 py-2.5">
+              <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                <RefreshCw size={10} strokeWidth={2} />
+                Mock · données simulées
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">v0.1</span>
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
