@@ -1,0 +1,52 @@
+Trois ajustements sur la sidebar (priorité haute) :
+
+1. BADGES "BIENTÔT" TROP LOURDS
+
+Les badges "BIENTÔT" sur Studio et Academy sont actuellement trop visuellement présents (contour, fond, uppercase) pour une information secondaire. Ils attirent trop l'œil et nuisent à la sobriété institutionnelle du produit.
+
+Remplace-les par un indicateur subtil. Deux options (choisis celle qui te semble la plus élégante) :
+- Un petit point coloré ou un petit "·" discret à droite du nom du module
+- Un libellé "Bientôt" en tout petit, gris très léger, sans bordure ni fond, en minuscules plutôt qu'uppercase
+- Ou simplement le nom du module en légèrement plus clair (texte muted) sans aucun badge, et un indicateur de "non-actif" seulement au hover
+
+Inspirations : Linear, Vercel, Notion — voir comment ils indiquent un module non encore actif sans crier.
+
+2. BOUTON "RÉDUIRE LE MENU" — TROP VERBEUX
+
+Supprime le bouton "Réduire le menu" tel qu'il existe (icône + texte sur une ligne dédiée dans le footer).
+
+Remplace-le par une petite icône chevron (ChevronLeft ou PanelLeftClose de lucide-react) positionnée discrètement en bas à gauche de la sidebar, sans texte. Le raccourci ⌘\ reste affiché dans le footer pour les utilisateurs avancés.
+
+Quand la sidebar est repliée, l'icône s'inverse (ChevronRight ou PanelLeftOpen) pour indiquer qu'elle peut être ré-ouverte.
+
+Inspirations : Linear, Notion — le chevron de sidebar est toujours minuscule, presque invisible, mais suffisant.
+
+3. NOUVEAU BOUTON "AIDE & RACCOURCIS" + RÉORGANISATION DE L'ORDRE
+
+Dans le footer de la sidebar, l'ordre final attendu est :
+
+[Dernier module Workspace]
+─────────────────
+[?] Aide & raccourcis
+[⚙] Paramètres
+─────────────────
+[Avatar] Ceo · CEO@STRATEIS.CO · [logout]
+─────────────────
+⌘K Recherche globale | [chevron replier discret]
+
+Le bouton "Aide & raccourcis" :
+- Icône : HelpCircle ou Keyboard (lucide-react)
+- Action au clic V1 : ouvre un panneau overlay (même style que les modals premium) qui liste les raccourcis clavier existants
+- Liste minimale pour V1 :
+  - ⌘K (ou Ctrl+K) — Ouvrir la palette de commandes
+  - ⌘\ (ou Ctrl+\) — Replier / déployer la sidebar
+  - Esc — Fermer les overlays
+  - ↑ ↓ — Naviguer dans la palette
+  - Enter — Ouvrir le module sélectionné
+- Le panneau peut aussi afficher un lien discret "Documentation" en bas (placeholder non-fonctionnel pour l'instant)
+
+Le bouton "Paramètres" reste en place, juste en-dessous de "Aide & raccourcis" dans le footer, comme convenu précédemment.
+
+---
+
+Ces 3 ajustements finalisent le shell. Ensuite on passe aux vrais modules.

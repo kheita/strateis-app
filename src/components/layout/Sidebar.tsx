@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { ChevronDown, ChevronsLeft, ChevronsRight, LogOut, Settings } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  Settings,
+  HelpCircle,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 import { NAVIGATION, type NavSection, type NavModule } from "../../config/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 import { Logo, LogoMark } from "../brand/Logo";
 import { Tooltip } from "../common/Tooltip";
-import { Badge } from "../common/Badge";
 import { Kbd, getModKeyLabel } from "../common/Kbd";
+import { ShortcutsModal } from "../help/ShortcutsModal";
 import { cn } from "../../lib/cn";
 
 type Props = {
@@ -28,11 +35,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: Props) {
           collapsed ? "justify-center px-2" : "justify-between px-4",
         )}
       >
-        {collapsed ? (
-          <LogoMark size={26} />
-        ) : (
-          <Logo size={26} />
-        )}
+        {collapsed ? <LogoMark size={26} /> : <Logo size={26} />}
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3">
@@ -97,6 +100,7 @@ function SidebarSection({ section, collapsed }: { section: NavSection; collapsed
 
 function SidebarItem({ module, collapsed }: { module: NavModule; collapsed: boolean }) {
   const Icon = module.icon;
+  const isSoon = !!module.badge;
 
   const link = (
     <NavLink
@@ -107,7 +111,9 @@ function SidebarItem({ module, collapsed }: { module: NavModule; collapsed: bool
           collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-1.5",
           isActive
             ? "surface-hover text-primary"
-            : "text-secondary hover:surface-subtle hover:text-primary",
+            : isSoon
+              ? "text-tertiary hover:surface-subtle hover:text-secondary"
+              : "text-secondary hover:surface-subtle hover:text-primary",
         )
       }
       end={false}
@@ -123,15 +129,22 @@ function SidebarItem({ module, collapsed }: { module: NavModule; collapsed: bool
           <Icon
             size={collapsed ? 16 : 14.5}
             strokeWidth={1.6}
-            className={cn("shrink-0", isActive ? "text-gold" : "text-tertiary group-hover:text-secondary")}
+            className={cn(
+              "shrink-0",
+              isActive
+                ? "text-gold"
+                : isSoon
+                  ? "text-muted group-hover:text-tertiary"
+                  : "text-tertiary group-hover:text-secondary",
+            )}
           />
           {!collapsed && (
             <>
               <span className="truncate">{module.label}</span>
-              {module.badge && (
-                <Badge variant="soon" className="ml-auto">
-                  {module.badge}
-                </Badge>
+              {isSoon && (
+                <span className="ml-auto font-mono text-[10px] lowercase tracking-normal text-muted">
+                  bientôt
+                </span>
               )}
             </>
           )}
@@ -158,9 +171,28 @@ function SidebarFooter({
   onToggleCollapse: () => void;
 }) {
   const { user, signOut } = useAuth();
+  const [helpOpen, setHelpOpen] = useState(false);
   const email = user?.email ?? "";
   const initials = (email[0] ?? "?").toUpperCase();
   const name = email.split("@")[0]?.replace(/\./g, " ") ?? "Utilisateur";
+
+  const helpButton = (
+    <button
+      type="button"
+      onClick={() => setHelpOpen(true)}
+      className={cn(
+        "group hover:surface-subtle flex w-full items-center gap-2.5 rounded-md text-[12px] text-secondary transition-base hover:text-primary",
+        collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-1.5",
+      )}
+    >
+      <HelpCircle
+        size={14}
+        strokeWidth={1.6}
+        className="text-tertiary group-hover:text-secondary shrink-0"
+      />
+      {!collapsed && <span>Aide & raccourcis</span>}
+    </button>
+  );
 
   const settingsLink = (
     <NavLink
@@ -180,7 +212,10 @@ function SidebarFooter({
           <Settings
             size={14}
             strokeWidth={1.6}
-            className={cn("shrink-0", isActive ? "text-gold" : "text-tertiary group-hover:text-secondary")}
+            className={cn(
+              "shrink-0",
+              isActive ? "text-gold" : "text-tertiary group-hover:text-secondary",
+            )}
           />
           {!collapsed && <span>Paramètres</span>}
         </>
@@ -189,36 +224,31 @@ function SidebarFooter({
   );
 
   return (
-    <div className="border-subtle border-t px-2 py-2">
-      <div className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
-        {collapsed ? (
-          <Tooltip label="Paramètres" side="right">
-            {settingsLink}
-          </Tooltip>
-        ) : (
-          settingsLink
-        )}
+    <>
+      <ShortcutsModal open={helpOpen} onClose={() => setHelpOpen(false)} />
 
-        <Tooltip label={collapsed ? "Déplier" : "Replier"} side="right" shortcut={`${getModKeyLabel()} \\`}>
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            className={cn(
-              "group hover:surface-subtle flex w-full items-center gap-2.5 rounded-md text-[12px] text-secondary transition-base hover:text-primary",
-              collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-1.5",
-            )}
-          >
-            {collapsed ? (
-              <ChevronsRight size={14} strokeWidth={1.75} className="text-tertiary" />
-            ) : (
-              <ChevronsLeft size={14} strokeWidth={1.75} className="text-tertiary" />
-            )}
-            {!collapsed && <span>Réduire le menu</span>}
-          </button>
-        </Tooltip>
+      {/* Group 1: Help + Settings */}
+      <div className="border-subtle border-t px-2 py-2">
+        <div className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
+          {collapsed ? (
+            <Tooltip label="Aide & raccourcis" side="right">
+              {helpButton}
+            </Tooltip>
+          ) : (
+            helpButton
+          )}
+          {collapsed ? (
+            <Tooltip label="Paramètres" side="right">
+              {settingsLink}
+            </Tooltip>
+          ) : (
+            settingsLink
+          )}
+        </div>
       </div>
 
-      <div className="border-subtle mt-2 border-t pt-2">
+      {/* Group 2: Account */}
+      <div className="border-subtle border-t px-2 py-2">
         <div
           className={cn(
             "flex items-center gap-2.5",
@@ -249,16 +279,43 @@ function SidebarFooter({
             </button>
           </Tooltip>
         </div>
+      </div>
+
+      {/* Group 3: Bottom row — ⌘K hint + discrete collapse chevron */}
+      <div
+        className={cn(
+          "border-subtle flex items-center border-t",
+          collapsed ? "justify-center px-2 py-1.5" : "justify-between px-3 py-1.5",
+        )}
+      >
         {!collapsed && (
-          <div className="mt-2 px-1.5">
+          <div className="flex items-center">
             <Kbd className="mr-1">{getModKeyLabel()}</Kbd>
             <Kbd>K</Kbd>
             <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-              Recherche globale
+              Recherche
             </span>
           </div>
         )}
+        <Tooltip
+          label={collapsed ? "Déployer la sidebar" : "Replier la sidebar"}
+          side={collapsed ? "right" : "top"}
+          shortcut={`${getModKeyLabel()} \\`}
+        >
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? "Déployer la sidebar" : "Replier la sidebar"}
+            className="hover:surface-subtle text-muted hover:text-secondary flex h-6 w-6 items-center justify-center rounded transition-base"
+          >
+            {collapsed ? (
+              <PanelLeftOpen size={13} strokeWidth={1.75} />
+            ) : (
+              <PanelLeftClose size={13} strokeWidth={1.75} />
+            )}
+          </button>
+        </Tooltip>
       </div>
-    </div>
+    </>
   );
 }
