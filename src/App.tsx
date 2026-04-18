@@ -8,6 +8,7 @@ import { CommandPalette } from "./components/palette/CommandPalette";
 import { LoginPage } from "./pages/LoginPage";
 import { ModulePlaceholder } from "./pages/ModulePlaceholder";
 import { SettingsPage } from "./pages/SettingsPage";
+import { IntelligenceDashboardPage } from "./pages/IntelligenceDashboardPage";
 import { ALL_MODULES } from "./config/navigation";
 
 function App() {
@@ -26,7 +27,8 @@ function App() {
                 }
               >
                 <Route index element={<Navigate to="/intelligence/dashboard" replace />} />
-                {ALL_MODULES.map((m) => (
+                <Route path="/intelligence/dashboard" element={<IntelligenceDashboardPage />} />
+                {ALL_MODULES.filter((m) => m.id !== "dashboard").map((m) => (
                   <Route
                     key={m.id}
                     path={m.path}

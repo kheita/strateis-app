@@ -1,0 +1,223 @@
+# Strateis App — Module Dashboard Intelligence V1
+
+Route : `/intelligence/dashboard`
+Repo : `kheita/strateis-app`
+Shell V1 déjà en production sur https://app.strateis.co
+
+---
+
+## Mission
+
+Construire le **premier vrai module** de la section Intelligence : un dashboard de vision consolidée qui répond, en un coup d'œil, à la double question qu'un CEO de cabinet se pose le matin — *"Comment va mon business ?"* et *"Qu'est-ce qui a bougé autour de moi ?"*.
+
+Le dashboard est le point d'entrée visible de toute la couche Intelligence. Il doit incarner le standard Strateis de façon exemplaire, parce qu'il sera le premier écran vu quotidiennement et le premier référencé dans les démos investisseurs et B2G.
+
+---
+
+## Paradigme — à respecter strictement
+
+**Glanceable, pas transactionnel.** On regarde, on comprend, on ressort. Aucune action de création/modification n'est initiée depuis ce module. Les tuiles ne sont pas cliquables en V1. L'utilisateur reçoit des signaux, il ne manipule rien.
+
+Conséquence sur l'UX : densité d'information élevée mais hiérarchie visuelle impeccable, zéro friction cognitive, lisibilité immédiate en 3 secondes, lisibilité approfondie en 15 secondes.
+
+---
+
+## Standard cabinet — référentiel qualité
+
+Le dashboard doit tenir face à ces comparables sans rougir :
+
+- **Bloomberg Terminal** pour la densité d'information et la rigueur des données
+- **Palantir Foundry** pour la sobriété institutionnelle et la confiance dégagée
+- **Stripe Dashboard** pour le calme et la maîtrise du hero
+- **Linear Insights** pour l'élégance des sparklines et l'économie de chrome
+- **BCG Enable / McKinsey QuantumBlack** pour la posture Big 4 assumée
+- **Datadog / Grafana** pour la zone widgets dense sans être écrasante
+
+Ce qu'on doit éviter absolument :
+- Esthétique SaaS générique (tuiles arrondies bleues pastel, icônes colorées type Stripe pour indie devs)
+- Dashboard "demo mode" avec fausses couleurs flashy
+- Emoji, gradients fun, illustrations 3D
+- Tout ce qui rappelle un template Notion ou un dashboard Metabase par défaut
+
+---
+
+## Système de design — déjà établi
+
+Le shell a installé le design system canonique (tokens couleur, typographie, spacing, animations, composants de base). **Ce module doit s'y inscrire sans dévier**. Si une décision de design doit être prise en contexte (taille de widget, densité d'une liste, hiérarchie typographique d'une valeur), l'agent applique le langage du shell, ne redéfinit rien.
+
+Principes hérités à respecter implicitement :
+- Dark-first, toggle light fonctionnel
+- DM Sans pour prose/titres, JetBrains Mono pour data/labels/timestamps/chiffres
+- Gold utilisé avec parcimonie (accents ponctuels, pas de flat fills)
+- Animations 150–220ms cubic-bezier(0.16, 1, 0.3, 1)
+- Tabular nums pour tous les chiffres
+- Sobriété institutionnelle avant tout
+
+---
+
+## Structure du dashboard
+
+### Zone 1 — Hero (partie haute, aérée)
+
+**4 tuiles KPI** côte à côte en desktop, qui racontent un arc narratif : **produit récurrent → potentiel futur → exécution présente → visibilité amont**.
+
+1. **MRR IdeeLab** — le revenu récurrent produit (FCFA)
+2. **Pipeline B2G** — le potentiel commercial (FCFA) avec sub-metric : count opportunités hot (score ≥ 7)
+3. **Missions actives** — l'exécution cabinet en cours (count) avec sub-metric : FCFA engagés + livrables en cours
+4. **Visibilité** — l'amont de la distribution : positions Top 10 Google avec sub-metric : mentions AEO semaine
+
+Chaque tuile doit comporter :
+- Un label court en mono uppercase
+- Une valeur dominante typographiquement forte
+- Un delta vs période précédente (pourcentage ou valeur absolue selon ce qui fait sens)
+- Une sub-metric discrète
+- Une sparkline qui montre la trajectoire sur une fenêtre pertinente (12 mois pour MRR, 12 semaines pour le reste)
+
+La zone hero doit **respirer**. Whitespace généreux entre les tuiles, pas de compression verticale. École Stripe/Linear, pas école Bloomberg sur cette zone.
+
+### Zone 2 — Widgets (partie basse, dense)
+
+**4 widgets** en grille 2×2, chacun travaillant fort dans son espace. École Bloomberg light / Datadog.
+
+**A. Agenda du jour** — liste verticale des événements du jour avec heure (mono), titre, lieu ou lien visio. Marqueur "MAINTENANT" matérialisé par une ligne horizontale qui se positionne selon l'heure courante. Max 6 événements visibles, scroll interne au-delà. **En V1, empty state par défaut** (le collecteur Google Calendar est hors scope de cette session — voir section Scope plus bas).
+
+**B. Feed Intelligence** — liste des 5 derniers items d'actualité avec onglets de filtrage : `Africa Tech` / `AI Tech` / `B2G` / `Tous`. Chaque item : titre sur 2 lignes max, source + timestamp relatif ("il y a 3h").
+
+**C. Top B2G hot** — liste des 5 opportunités B2G de plus haut score. Par ligne : nom entité, secteur (badge discret), montant estimé (mono à droite), barre de score 0-10 visualisée sobrement.
+
+**D. Tracker SEO + AEO** — split horizontal. Gauche SEO : pages indexées ideelab.io + strateis.co avec sparkline 30 jours et valeur du jour. Droite AEO : mentions semaine en bars verticales sur 12 semaines.
+
+### Zone TopBar — refresh
+
+En haut à droite du dashboard, un contrôle de refresh discret :
+- Affiche le timestamp du dernier sync en mono
+- Icône rotate cliquable pour forcer un refresh manuel
+- Label court en mono uppercase (ex. "SYNC")
+
+Polling automatique toutes les 60 secondes (matche le cache backend).
+
+---
+
+## Sources de données — câblage réel dès V1
+
+Le backend est déjà prêt. Le dashboard consomme l'Edge Function agrégée :
+
+```
+GET https://ajmfiddqmjhsrqynwpkg.supabase.co/functions/v1/monitor-fetch?view=dashboard
+Authorization: Bearer <clé anon Supabase>
+```
+
+Cette Edge Function retourne en un seul appel : les données SEO des 30 derniers jours, les dernières valeurs KPIs, le top 5 B2G, et l'état de santé des sources.
+
+Pour les widgets qui ont besoin de vues spécifiques (Feed, AEO, agenda), appeler les endpoints correspondants :
+```
+GET monitor-fetch?view=feeds
+GET monitor-fetch?view=b2g
+GET monitor-fetch?view=seo
+```
+
+Tables Supabase consultables directement si besoin (toutes en RLS SELECT pour authenticated) :
+- `monitor_kpis_daily` — MRR IdeeLab, missions actives, revenus engagés
+- `monitor_b2g_pipeline` — opportunités B2G scorées
+- `monitor_ranking_weekly` — positions Google hebdo
+- `monitor_aeo_weekly` — mentions AEO hebdo
+- `monitor_seo_daily` — indexation quotidienne
+- `monitor_feed_items` — feed d'actualités
+- `monitor_source_health` — santé des sources (déjà câblé dans le shell)
+
+**Clé anon Supabase** : utiliser la variable d'environnement `VITE_SUPABASE_ANON_KEY` déjà configurée dans le projet.
+
+---
+
+## Empty states — citoyens de première classe
+
+**Règle dure** : au premier déploiement, plusieurs sources seront vides (les collecteurs ne sont pas encore tous alimentés). Les empty states doivent être conçus avec le même soin que les états chargés, pas bâclés.
+
+Chaque empty state doit comporter :
+- Une icône contextuelle discrète (jamais une icône warning agressive)
+- Un titre court qui explique la situation sans jargon
+- Une ligne de description qui dit ce qui se passera ensuite
+- Un micro-label mono (type pastille) qui catégorise le statut : par exemple `COLLECTEUR EN ATTENTE`, `DONNÉES OBSOLÈTES`, `PROCHAIN CYCLE 06:00 UTC`, `CALENDAR NON CÂBLÉ`, `SOURCE INDISPONIBLE`
+
+**Interdictions explicites** :
+- ❌ Jamais "Aucune donnée" brut
+- ❌ Jamais de CTA "Configurer" ou "Ajouter une source" (on est en Intelligence, pas en Workspace)
+- ❌ Jamais d'illustration décorative (pas de vectors "empty box")
+- ❌ Jamais de message alarmiste
+
+L'objectif : que les empty states soient suffisamment beaux pour qu'on puisse lancer une démo avec un dashboard à 50% vide sans rougir.
+
+---
+
+## États visuels à implémenter
+
+- **Loading** : skeleton shimmer au premier mount de chaque tuile/widget. Pas de spinner global.
+- **Chargé** : état nominal.
+- **Empty** : voir section ci-dessus.
+- **Stale** (donnée > 24h) : afficher la valeur grisée avec micro-pastille `DONNÉES OBSOLÈTES` et timestamp de la dernière valeur connue.
+- **Erreur API** : bannière slim en haut du dashboard (ton rouge subdued, jamais agressif), le reste de l'UI continue d'afficher les dernières valeurs mises en cache côté client.
+
+---
+
+## Responsive
+
+- **≥1280px** : hero 4 colonnes, widgets 2×2
+- **768–1279px** : hero 2×2, widgets empilés en 1 colonne
+- **<768px** : hero empilé verticalement en 4 tuiles compactes (scroll), widgets empilés
+
+La mobilité doit rester utilisable — pas besoin d'optimiser pour mobile-first mais zéro régression sur tablette/téléphone.
+
+---
+
+## Scope V1 — ce qui est explicitement hors scope
+
+Ne pas implémenter en V1, même si l'envie est forte :
+
+- ❌ **Drill-down cliquable** sur les tuiles hero (ouverture d'un drawer détail) — V2
+- ❌ **Toggle période** jour/semaine/mois — V2
+- ❌ **Carte Afrique** avec hotspots B2G — module dédié ultérieur
+- ❌ **Collecteur backend Google Calendar** — follow-up backend séparé, l'agenda reste en empty state
+- ❌ **Personnalisation** des tuiles (drag & drop, masquage) — V2+
+- ❌ **Export PDF** du dashboard — V2+
+- ❌ **Filtrage global** par période ou tag — V2
+
+Si un doute surgit sur un élément non listé ici, la règle est simple : **ne pas l'ajouter**. On livre un module parfait sur un scope serré.
+
+---
+
+## Posture éditoriale
+
+- Français partout (labels, messages, empty states, pastilles)
+- Ton cabinet : sobre, précis, institutionnel — jamais familier, jamais marketing
+- Aucun emoji, aucune formule fun, aucun "Bienvenue !" ou équivalent
+- Les montants FCFA toujours formatés avec séparateur de milliers (espace insécable)
+- Les deltas avec signe explicite (+/−) et pourcentage à une décimale max
+- Les timestamps en format court et relatif ("il y a 3h", "hier 14:32")
+
+---
+
+## Critères d'acceptation
+
+Le module est considéré livré quand :
+
+1. La route `/intelligence/dashboard` remplace le placeholder par le module fonctionnel
+2. Les 4 tuiles hero affichent leurs données réelles (ou empty states premium si sources vides)
+3. Les 4 widgets affichent leurs données réelles (ou empty states premium)
+4. Le refresh automatique (60s) et le refresh manuel fonctionnent
+5. Les 5 états (loading, chargé, empty, stale, erreur API) sont tous implémentés
+6. Le responsive tient sur desktop/tablette/mobile
+7. Zéro erreur console, zéro warning React bloquant
+8. Le dashboard est indiscernable en qualité d'un écran Bloomberg/Palantir/Linear dans la même catégorie
+9. L'ensemble s'inscrit naturellement dans le langage visuel du shell, sans rupture
+
+---
+
+## Livraison
+
+- Un seul commit propre avec message clair
+- Push sur `main`, déploiement automatique via Cloudflare Pages
+- Vérification visuelle sur https://app.strateis.co/intelligence/dashboard après déploiement
+
+---
+
+*Mythos posture active. Honnêteté absolue, zéro sycophantie, pas d'hallucination. Si une décision technique bloque ou si une source backend ne répond pas comme attendu, le signaler immédiatement plutôt que de bricoler un fallback silencieux.*

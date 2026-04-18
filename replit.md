@@ -17,8 +17,17 @@ Strateis App est le cockpit digital interne de Strateis Partners — un cabinet 
 - **Typographie** : DM Sans (contenu) + JetBrains Mono (data, labels, timestamps)
 - **Mode** : dark-first (light disponible en option)
 
-## État actuel — Shell V1 (livré)
-Le squelette de l'application est en place, prêt à recevoir les modules métier dans des itérations futures.
+## État actuel — Shell V1 + Dashboard Intelligence V1 (livrés)
+Le squelette de l'application est en place et le premier module métier (Intelligence / Dashboard) est livré.
+
+### Dashboard Intelligence V1 (`/intelligence/dashboard`)
+- 4 tuiles KPI hero (MRR IdeeLab, Pipeline B2G, Missions actives, Visibilité) avec sparklines, deltas, états stale
+- 4 widgets 2×2 : Agenda (empty state Calendar non câblé), Feed Intelligence (4 onglets), Top B2G hot (5 + scoring), Tracker SEO + AEO (sparkline + bars)
+- Refresh control (sync timestamp + bouton manuel) avec polling auto 60 s
+- 5 états visuels : loading (skeletons), chargé, empty (premium, jamais "Aucune donnée"), stale (24 h+), erreur API (bannière slim, garde le cache)
+- Données réelles via Edge Function `monitor-fetch` (views dashboard/feeds/b2g/seo) + table `monitor_kpis_daily`
+- Erreurs partielles vs globales distinguées et exposées via bannière dédiée
+- Responsive : ≥1280 hero 4×1 / widgets 2×2 ; 768–1279 hero 2×2 / widgets empilés ; <768 tout empilé
 
 Inclut :
 - Authentification Supabase (email + mot de passe) avec route guard
@@ -41,12 +50,14 @@ Inclut :
 ## Architecture
 ```
 src/
-  components/{auth,brand,common,layout,palette,status}/
+  components/{auth,brand,common,help,layout,palette,status}/
+  components/dashboard/{KpiTile,Widget,Sparkline,EmptyState,Skeleton,RefreshControl,ErrorBanner}.tsx
+  components/dashboard/widgets/{Agenda,Feed,B2G,SeoAeo}Widget.tsx
   contexts/{Auth,Theme,CommandPalette}Context.tsx
-  hooks/{useUtcClock,useSidebarCollapse}.ts
+  hooks/{useUtcClock,useSidebarCollapse,useDashboardData}.ts
   config/{navigation,sources}.ts
-  pages/{LoginPage,ModulePlaceholder}.tsx
-  lib/{supabase,cn,keyboard}.ts
+  pages/{LoginPage,ModulePlaceholder,SettingsPage,IntelligenceDashboardPage}.tsx
+  lib/{supabase,cn,keyboard,format,dashboardApi}.ts
 ```
 
 ## Développement
