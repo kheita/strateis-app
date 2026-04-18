@@ -6,7 +6,7 @@ serve(async (req) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-api-key",
   };
 
   if (req.method === "OPTIONS") {
@@ -35,10 +35,10 @@ serve(async (req) => {
         ]);
 
         data = {
-          seo: seoLatest.data,
-          kpis: kpisLatest.data?.[0],
-          b2g_hot: b2gOpen.data,
-          sources_health: healthList.data,
+          seo: seoLatest.data ?? [],
+          kpis: kpisLatest.data?.[0] ?? null,
+          b2g_hot: b2gOpen.data ?? [],
+          sources_health: healthList.data ?? [],
         };
         break;
       }
@@ -46,7 +46,7 @@ serve(async (req) => {
       case "status": {
         const health = await supabase.from("monitor_source_health").select("*").order("is_critical", { ascending: false });
         const alerts = await supabase.from("monitor_alerts").select("*").eq("acknowledged", false).order("triggered_at", { ascending: false }).limit(20);
-        data = { sources: health.data, alerts: alerts.data };
+        data = { sources: health.data ?? [], alerts: alerts.data ?? [] };
         break;
       }
 
@@ -58,7 +58,7 @@ serve(async (req) => {
           .eq("category", category)
           .order("published_at", { ascending: false })
           .limit(limit);
-        data = { items: feeds.data };
+        data = { items: feeds.data ?? [] };
         break;
       }
 
@@ -66,7 +66,7 @@ serve(async (req) => {
         const b2g = await supabase.from("monitor_b2g_pipeline")
           .select("*")
           .order("deadline", { ascending: true });
-        data = { pipeline: b2g.data };
+        data = { pipeline: b2g.data ?? [] };
         break;
       }
 
@@ -77,7 +77,7 @@ serve(async (req) => {
         const concurrents = await supabase.from("monitor_concurrents")
           .select("*")
           .order("last_activity_date", { ascending: false });
-        data = { timeline: rdue.data, concurrents: concurrents.data };
+        data = { timeline: rdue.data ?? [], concurrents: concurrents.data ?? [] };
         break;
       }
 
@@ -85,7 +85,7 @@ serve(async (req) => {
         const seoData = await supabase.from("monitor_seo_daily").select("*").order("date", { ascending: false }).limit(90);
         const ranking = await supabase.from("monitor_ranking_weekly").select("*").order("week_start", { ascending: false }).limit(12);
         const aeo = await supabase.from("monitor_aeo_weekly").select("*").order("week_start", { ascending: false }).limit(12);
-        data = { daily: seoData.data, ranking: ranking.data, aeo: aeo.data };
+        data = { daily: seoData.data ?? [], ranking: ranking.data ?? [], aeo: aeo.data ?? [] };
         break;
       }
 
