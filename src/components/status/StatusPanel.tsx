@@ -145,12 +145,17 @@ export function StatusPanel({ open, onClose, mode = "dropdown", anchorRef }: Pro
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             role="dialog"
             aria-label="Statut système"
           >
             <div
-              className="absolute inset-0 bg-[rgb(var(--bg-app))]/65 backdrop-blur-md"
+              className="absolute inset-0"
+              style={{
+                background: "rgba(6, 11, 20, 0.65)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+              }}
               onClick={onClose}
             />
             <motion.div
