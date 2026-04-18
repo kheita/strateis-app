@@ -1,0 +1,277 @@
+# PROMPT REPLIT — STRATEIS APP / SHELL V1
+## Le système d'exploitation d'un cabinet de conseil africain moderne
+
+---
+
+## 1. CE QUE TU CONSTRUIS
+
+Tu es le designer-développeur qui va donner vie à **Strateis App**, le cockpit digital interne de Strateis Partners — un cabinet de conseil stratégique basé à Abidjan qui travaille sur des mandats de niveau international. L'app sera déployée sur `app.strateis.co`.
+
+Ce prompt couvre uniquement le **Shell** : le squelette de l'application (sidebar, topbar, auth, navigation, status panel, design system de base, toggle dark/light). Les modules métier viendront dans des prompts ultérieurs. Mais **ce shell donne le ton** pour tout ce qui suivra — c'est la première impression, la colonne vertébrale visuelle, l'identité du produit.
+
+---
+
+## 2. POSITIONNEMENT & AMBITION
+
+**Positionnement** : *"Un cabinet de conseil africain moderne mérite la même qualité d'outillage qu'un cabinet à Londres ou New York. Pas une version dégradée. Pas un clone low-cost. Le même niveau."*
+
+**Ambition produit** : Strateis App vise à devenir un **produit primable**, adaptable en marque blanche pour d'autres cabinets, institutions et clients B2G (BAD, AFD, CDC-CI Capital, Banque Mondiale, GIZ) à horizon 2027. Ce que tu construis aujourd'hui doit pouvoir soutenir cette ambition.
+
+**L'utilisateur type** : un dirigeant de cabinet qui consulte des dashboards Bloomberg, utilise Notion et Linear au quotidien, et a des standards visuels élevés. Il attend un outil qui inspire la même confiance qu'un livrable McKinsey.
+
+---
+
+## 3. UNIVERS ESTHÉTIQUE — INSPIRATIONS
+
+Les références suivantes définissent l'univers visuel visé. Imprègne-toi de chacune :
+
+### 3.1 Outils de grands cabinets / institutions
+- **Bloomberg Terminal** : densité d'information maximale sans sacrifier la lisibilité, chaque pixel sert un propos
+- **Palantir Foundry / Gotham** : sobriété intimidante, bleu profond, typographie chirurgicale, pouvoir visible
+- **BCG Enable / McKinsey QuantumBlack** : interfaces data confiance institutionnelle, moderne sans être "trendy"
+- **Deloitte Illuminate / PwC Perform** : gravité professionnelle, espace, typographie premium
+
+### 3.2 Produits tech primés (pour l'exécution)
+- **Linear** : sobriété, vitesse perçue, sidebar impeccable, hover states parfaits, zéro bruit visuel
+- **Superhuman** : polish absolu, raccourcis clavier partout, chaque détail pensé, l'outil "premium" par excellence
+- **Raycast** : Command Palette élégante, densité sans étouffement, dark mode exceptionnel
+- **Arc Browser** : créativité dans la structure, sidebar intelligente, animations qui servent
+- **Notion** : navigation multi-niveaux fluide, profondeur d'usage
+
+### 3.3 Ce que ces références ont en commun
+Quand tu les regardes toutes, le dénominateur commun est :
+- **Sobriété disciplinée** : peu de couleurs, beaucoup de niveaux de gris, pas de gradients flashy
+- **Typographie comme architecture** : la hiérarchie se fait par la typo, pas par les couleurs
+- **Animations fonctionnelles** : 150-250ms, jamais de show-off
+- **Espace maîtrisé** : respiration sans vide, densité sans asphyxie
+- **Détails invisibles** : hover, focus, loading, transitions — tout est poli
+- **Personnalité** : chaque produit a son caractère, aucun ne ressemble à un template
+
+**Ce que tu dois éviter absolument** :
+- Le look "dashboard Tailwind générique" — tu le sais quand tu le vois
+- Les gradients purple/pink qui pullulent en 2025-2026
+- Les cartes avec ombres portées lourdes
+- Les emoji partout dans la UI (usage très chirurgical uniquement)
+- Les formulations SaaS typiques ("Boost your productivity", etc.)
+- Les animations décoratives sans fonction
+
+---
+
+## 4. CONTRAINTES DE MARQUE — NON-NÉGOCIABLES
+
+Ces éléments sont l'ADN visuel de Strateis. Tu peux (et dois) exercer ta créativité partout ailleurs, mais ces points sont fixes :
+
+### 4.1 Palette de marque
+
+**Les deux couleurs qui définissent Strateis** :
+- **Navy profond** : le fond, l'autorité, la gravité. Base autour de `#0B1121` mais tu as la liberté d'ajuster les variations de gris-bleu profond qui l'accompagnent.
+- **Gold / Or** : l'accent, l'excellence, le premium. Base autour de `#D4A853`. C'est la signature visuelle de Strateis. **Le gold est précieux — utilisé avec parcimonie, jamais étalé partout**.
+
+Pour tout le reste (grays, semantic colors success/warning/error, accents secondaires si besoin), tu as carte blanche. Respecte juste la sobriété globale.
+
+**Une règle forte** : le gold n'apparaît que sur le **logo**, les **éléments actifs**, les **CTAs primaires**, et les **moments d'accent volontaires**. Jamais comme couleur de remplissage générique.
+
+### 4.2 Typographie
+
+**Les deux familles imposées** :
+- **DM Sans** : pour tout le contenu, les titres, les prose
+- **JetBrains Mono** : pour les données, labels, timestamps, tags, KPIs, tout ce qui est numérique ou technique
+
+Tu as liberté totale sur les tailles, les weights, les line-heights, les letter-spacings. Compose ta propre échelle typographique cohérente. Les références Linear et Superhuman sont de très bons points de départ.
+
+### 4.3 Dark-first
+
+Strateis App est **dark-first**. Le dark est le mode par défaut, pensé et peaufiné en premier. Le light est une courtoisie pour les utilisateurs qui le préfèrent, mais il ne doit pas être un compromis.
+
+Toggle dark/light à prévoir, avec transition douce.
+
+### 4.4 Logo
+
+Le logo Strateis App est à créer. Idée directrice : un "S" stylisé, carré ou avec un élément subtil qui évoque l'infrastructure / la structure. Gold sur fond navy. Simple, reconnaissable, premium. Tu as la main pour le design exact.
+
+### 4.5 Nom affiché
+
+- **Nom produit** : Strateis App
+- **Baseline (optionnelle, à toi de voir si tu veux la montrer)** : *"Cockpit de cabinet moderne"* ou *"L'OS de votre cabinet"* ou quelque chose que tu trouves meilleur
+
+---
+
+## 5. STACK TECHNIQUE — NON-NÉGOCIABLE
+
+- **Vite** + **React 18** + **TypeScript** (strict mode)
+- **Tailwind CSS** pour le styling
+- **React Router v6** pour la navigation
+- **Supabase** pour l'auth (client JS officiel)
+- **Framer Motion** pour les animations plus complexes (gère les simples en CSS/Tailwind)
+- **Lucide React** pour les icônes (librairie déjà utilisée dans l'écosystème Strateis)
+
+Tu choisis librement comment structurer les composants, les hooks, les utils. Tu proposes la meilleure architecture que tu connais. Vise la clarté, la maintenabilité, la réutilisabilité. TypeScript strict sans `any`.
+
+---
+
+## 6. FONCTIONNALITÉS DU SHELL
+
+### 6.1 Authentication
+- Page de login minimaliste et premium (email + password)
+- Connexion via Supabase Auth (deux comptes existants : `ceo@strateis.co` et `aguibou.tall@strateis.co`)
+- Route guard : tout le reste nécessite d'être authentifié
+- Hook `useAuth` bien architecturé
+- Gestion propre des états (loading, error, success)
+- La page d'auth doit donner envie. Elle définit la première impression.
+
+### 6.2 Sidebar
+- Navigation principale de l'app
+- Regroupe les modules en **deux sections distinctes** :
+  - **INTELLIGENCE** (pour les modules de monitoring/veille)
+  - **WORKSPACE** (pour les modules de gestion/production)
+- Chaque section peut être collapsée
+- Présence d'un footer en bas de sidebar (status panel trigger, notifications, profil utilisateur)
+- **Liste des modules** (tous en placeholder pour ce shell, mais navigables) :
+
+**INTELLIGENCE** :
+- Dashboard
+- Veille Africa Tech
+- Veille IA & Tech
+- B2G Pipeline
+- Réglementaire
+- Concurrence
+- SEO & Visibilité
+- Feeds Live
+
+**WORKSPACE** :
+- Hub
+- Consulting
+- IdeeLab
+- Studio (avec badge discret "Bientôt")
+- Academy (avec badge discret "Bientôt")
+- Opérations
+- Content
+- Frameworks
+
+Tu choisis les icônes, le layout exact, les animations de collapse, la façon dont les sections se distinguent visuellement.
+
+### 6.3 TopBar
+- Breadcrumb de la page actuelle (section + module)
+- Zone centrale avec une barre de recherche globale (placeholder fonctionnel pour le shell — elle pourra ouvrir une Command Palette style Raycast plus tard)
+- Indicateur de santé globale du système (cliquable, ouvre le Status Panel)
+- Horloge UTC en temps réel (subtile, mais présente — inspiration Bloomberg)
+- Toggle dark/light theme
+- Bouton notifications
+
+Tu as la main sur l'arrangement, les styles, les micro-interactions.
+
+### 6.4 Status Panel
+Inspiré de World Monitor (worldmonitor.app) et du concept "External APIs are unreliable — transparency enables informed interpretation".
+
+Panel flottant qui liste toutes les sources de données de l'app avec :
+- État (OK / Stale / Down)
+- Dernière mise à jour
+- Fréquence attendue
+- Uptime récent
+
+Pour ce shell, les données sont statiques/mockées (8-10 sources représentatives). La vraie connexion backend viendra plus tard.
+
+C'est un élément de **différenciation produit** majeur — il faut qu'il soit magnifique, qu'il inspire confiance, qu'il donne envie de le regarder. C'est ta vitrine de transparence radicale.
+
+### 6.5 Pages placeholder
+Deux pages placeholder minimales pour valider que la navigation marche et donner un aperçu de ce que sera l'app :
+- Une page Intelligence (sommaire élégant de ce qui arrive)
+- Une page Workspace (pareil)
+
+Ne passe pas trop de temps dessus — elles seront remplacées par les vrais modules.
+
+### 6.6 Toggle dark/light
+Transition douce entre les deux modes. Dark est par défaut. La préférence est sauvegardée (localStorage).
+
+### 6.7 Responsive
+- Desktop (primary) : expérience complète
+- Tablet : sidebar réduite à icônes, tooltips au hover
+- Mobile : sidebar cachée, hamburger menu, layout stack
+
+Tu décides des breakpoints et de l'UX exacte.
+
+---
+
+## 7. PRINCIPES DE CONCEPTION
+
+Applique ces principes comme des boussoles :
+
+### 7.1 Densité sans surcharge
+Les outils institutionnels montrent beaucoup d'information sans étouffer. Obtenu par : hiérarchie typographique rigoureuse, espace blanc calculé, couleurs retenues, bordures subtiles.
+
+### 7.2 Chaque pixel a un propos
+Si un élément n'apporte rien (informationnellement ou fonctionnellement), il sort. Pas de décoration gratuite.
+
+### 7.3 Animations fonctionnelles
+Chaque animation communique quelque chose : entrée/sortie, feedback, transition d'état. 150ms pour les micro-interactions, 250ms pour les grosses transitions. Easing cohérent.
+
+### 7.4 Hover et focus impeccables
+Chaque élément interactif a un hover state bien pensé et un focus state accessible. C'est là que se voit la qualité.
+
+### 7.5 Loading states propres
+Pas de flash blanc, pas de layout shift. Skeletons ou indicateurs subtils.
+
+### 7.6 Zéro erreur console
+L'app doit tourner sans warning ni error en développement et en production.
+
+### 7.7 Accessibilité
+Contraste suffisant, ARIA labels, navigation clavier, focus visibles.
+
+---
+
+## 8. CE QU'UN PRODUIT PRIMABLE A QUE LES AUTRES N'ONT PAS
+
+Pense comme un designer de chez Linear ou Vercel. Voici les détails qui font la différence :
+
+- **Les transitions de page** : fluides, pas de cut abrupt
+- **Le skeleton loading** : au lieu d'un spinner, une silhouette de la page qui se remplit
+- **Les tooltips** : timing parfait (300-500ms de délai), positionnement intelligent, typographie soignée
+- **Les keyboard shortcuts** : au minimum ⌘K pour ouvrir la recherche, ⌘\ pour toggle sidebar, esc pour fermer les modaux
+- **Les empty states** : pas "Aucune donnée" générique — un message réfléchi qui guide l'action
+- **Le favicon** : soigné, reconnaissable
+- **Le document title** : mis à jour selon la page
+- **Les meta tags** : OG image, description, titre — pour quand on partage un lien
+- **Les sons** : non (sauf si tu as une idée géniale)
+- **Le preloading intelligent** : les routes probablement à venir sont préchargées
+
+Tout ça n'est pas du nice-to-have. C'est ce qui distingue les produits primables des autres.
+
+---
+
+## 9. CE QUE TU LIVRES
+
+Une app Replit **fonctionnelle, polie, inspirante** qui :
+
+1. Implémente un shell complet avec toutes les fonctionnalités décrites
+2. Respecte l'identité de marque Strateis (navy + gold, DM Sans + JetBrains Mono, dark-first)
+3. Atteint le niveau qualitatif des références citées (Linear, Superhuman, Palantir, Bloomberg)
+4. Utilise la stack imposée sans exception
+5. Inclut les routes placeholder pour tous les modules listés
+6. Fonctionne parfaitement en desktop, correctement en tablet, acceptablement en mobile
+7. N'a aucune erreur console
+8. A un README.md minimal qui explique comment l'installer et la lancer
+
+Pour Supabase : tu utilises des variables d'environnement Replit Secrets (`VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`). Je te les fournirai au moment où tu en auras besoin.
+
+---
+
+## 10. LA FAÇON DONT TU TRAVAILLES
+
+- **Tu exerces ton jugement**. Si tu penses qu'une idée listée ici peut être améliorée, propose mieux.
+- **Tu n'empiles pas les features sans soin**. Prends le temps de peaufiner chaque détail.
+- **Tu vises le "wow" à la première ouverture**. Quand j'ouvre ton shell, je dois avoir envie d'y passer la journée.
+- **Tu signales ce qui n'est pas clair**. Si un point du prompt est ambigu ou contradictoire, demande avant de coder.
+- **Tu itères visuellement**. Montre-moi des écrans, ajuste, améliore.
+
+---
+
+## 11. RAPPEL FINAL
+
+Ce que tu construis n'est pas une app de plus. C'est la **première pierre d'un produit destiné à être primé et vendu en marque blanche à des institutions panafricaines**. L'exigence doit être à la hauteur.
+
+Prends le temps qu'il faut. Fais-le bien. Montre ce dont tu es capable quand on te fait confiance.
+
+---
+
+*Strateis Partners SAS — Avril 2026*
+*"Un cabinet de conseil africain moderne mérite la même qualité d'outillage qu'un cabinet à Londres ou New York."*
