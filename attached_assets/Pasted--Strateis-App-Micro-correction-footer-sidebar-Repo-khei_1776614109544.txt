@@ -1,0 +1,107 @@
+# Strateis App — Micro-correction footer sidebar
+
+Repo : `kheita/strateis-app` (déjà connecté à GitHub via l'intégration OAuth du workspace)
+Branche : `main`
+Scope : très petit. Deux modifications uniquement dans le composant de la sidebar (ou équivalent selon la structure actuelle).
+
+---
+
+## Contexte
+
+Le Dashboard Intelligence V1 est livré en production sur `app.strateis.co/intelligence/dashboard` et fonctionne. Après revue visuelle, deux micro-ajustements sont nécessaires sur le footer de la sidebar gauche. Rien d'autre ne change dans l'app — ni design system, ni composants, ni backend, ni config.
+
+---
+
+## Modification 1 — Supprimer le raccourci `Ctrl+K` redondant
+
+Le footer sidebar affiche actuellement, tout en bas, un bloc avec :
+- Les touches `Ctrl` `K` (mono, style keyboard hint)
+- Le mot `RECHERCHE` en mono uppercase
+
+Ce bloc est **redondant** avec le raccourci `Ctrl K` déjà présent à droite du champ "Rechercher un module..." dans la TopBar. Convention UX : un seul endroit pour chaque raccourci (pattern Linear, Raycast, Superhuman, Notion). On garde celui de la TopBar (canonique), on supprime celui du footer sidebar.
+
+**Action** : supprimer intégralement ce bloc du footer sidebar. Ne pas le remplacer par un autre élément. Ne rien ajouter à la place. Le whitespace créé est désiré.
+
+---
+
+## Modification 2 — Réorganiser le footer sidebar
+
+L'ordre actuel du footer sidebar (de haut en bas) est approximativement :
+```
+─────────
+Aide & raccourcis
+Paramètres
+─────────
+[Avatar + Ceo + CEO@STRATEIS.CO]    [icône logout à droite]
+─────────
+Ctrl K  RECHERCHE   ← à supprimer (modification 1)
+```
+
+L'ordre attendu après correction (de haut en bas) :
+```
+─────────
+Aide & raccourcis
+Paramètres
+─────────
+Avatar + Ceo + CEO@STRATEIS.CO
+Logout   ← dernier élément, après le bloc identité
+─────────
+(bord inférieur de la sidebar)
+```
+
+**Contraintes** :
+- Le bouton/icône de logout doit être **le tout dernier élément** visible avant le bord inférieur de la sidebar, après le bloc identité (avatar + nom + email)
+- Le logout peut rester une icône seule si c'est le choix actuel, ou devenir une ligne horizontale avec icône + label "Se déconnecter" / "Logout" — choisir ce qui est le plus cohérent avec le reste du design system Strateis déjà en place dans la sidebar (les autres lignes du footer comme "Aide & raccourcis" et "Paramètres" ont un format icône+label horizontal, donc aligner dessus est naturel)
+- Conserver la lisibilité, l'espacement, les tokens de couleur et le comportement responsive déjà en place
+- Aucun changement de palette, de typographie, ou de composant qui ne soit strictement nécessaire à ces deux corrections
+
+---
+
+## Hors scope
+
+Ne pas toucher à :
+- Le Dashboard Intelligence et ses widgets
+- La TopBar (l'indicateur INCIDENT reste tel quel, ce comportement se corrigera naturellement quand les collecteurs deviendront live)
+- Les Edge Functions backend
+- Les empty states
+- Le command palette (⌘K / Ctrl+K) lui-même — seul l'affichage du raccourci dans le footer sidebar est supprimé, le raccourci clavier reste actif
+- Tout autre module de navigation
+
+Si un doute survient sur un détail non couvert ici, **ne pas l'ajouter**.
+
+---
+
+## Critères d'acceptation
+
+1. Le bloc `Ctrl K RECHERCHE` n'apparaît plus dans le footer sidebar
+2. Le bouton logout est le dernier élément visible avant le bord inférieur de la sidebar
+3. L'ordre vertical du footer est : Aide & raccourcis → Paramètres → bloc identité → logout
+4. Le raccourci Ctrl+K de la TopBar fonctionne toujours et ouvre le command palette
+5. Zéro erreur console, zéro régression visuelle sur le reste du shell
+6. Le responsive tient sur desktop/tablette/mobile
+
+---
+
+## Livraison — OBLIGATOIRE
+
+**Cette tâche n'est pas considérée terminée tant que le code n'est pas sur `origin/main` de `kheita/strateis-app`.**
+
+Workflow attendu à la fin du travail :
+
+1. `git status` pour confirmer les fichiers modifiés (devrait être 1 ou 2 fichiers seulement — le composant sidebar)
+2. `git add -A`
+3. `git commit -m "chore(sidebar): remove redundant Ctrl+K hint, move logout to bottom"`
+4. `git fetch origin main`
+5. Si divergence détectée : `git pull --rebase origin main` (tu as permission explicite de rebase pour cette tâche — aucun conflit attendu puisque la modification ne touche qu'un fichier de composant)
+6. `git push origin main`
+
+**Rapport-moi explicitement** :
+- Le hash du commit final sur `origin/main`
+- La liste des fichiers modifiés
+- Confirmation que `git status` final est clean et que `git log origin/main -1` affiche bien le nouveau commit
+
+Si le push échoue pour une quelconque raison, ne pas tenter de contournement silencieux : rapporter l'erreur brute et s'arrêter.
+
+---
+
+*Posture : sobriété, discipline de scope, pas de "pendant que j'y suis je corrige aussi X". Une seule chose à la fois, proprement.*
