@@ -100,6 +100,13 @@ export type DashboardSnapshot = {
   kpisDaily: KpiDailyPoint[];
   /** Per-view fetch errors (omitted entries succeeded). */
   viewErrors: Partial<Record<ViewKey, string>>;
+  /** True if at least one row in the loaded data carries is_seed=true. */
+  hasSeedData: boolean;
+};
+
+type FetchViewResult<T> = {
+  data: T;
+  hasSeedData: boolean;
 };
 
 // ---------- Edge function helpers ----------
@@ -108,7 +115,7 @@ async function fetchView<T = unknown>(
   view: ViewKey,
   params?: Record<string, string>,
   signal?: AbortSignal,
-): Promise<T> {
+): Promise<FetchViewResult<T>> {
   const qs = new URLSearchParams({ view, ...(params ?? {}) }).toString();
   const url = `${SUPABASE_URL}/functions/v1/monitor-fetch?${qs}`;
   // Use the user JWT if available, otherwise fall back to anon.
@@ -124,8 +131,14 @@ async function fetchView<T = unknown>(
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);
   }
-  const json = (await res.json()) as { data?: T };
-  return (json.data ?? ({} as T));
+  const json = (await res.json()) as {
+    data?: T;
+    meta?: { has_seed_data?: boolean };
+  };
+  return {
+    data: json.data ?? ({} as T),
+    hasSeedData: json.meta?.has_seed_data === true,
+  };
 }
 
 function asMessage(reason: unknown): string {
@@ -172,16 +185,26 @@ export async function fetchDashboardSnapshot(signal?: AbortSignal): Promise<Dash
 
   // Normalize all time series to ascending order so consumers can use `last()`.
   const rawSeoDaily =
-    (seo.status === "fulfilled" && seo.value.daily) ||
-    (dash.status === "fulfilled" && dash.value.seo) ||
+    (seo.status === "fulfilled" && seo.value.data.daily) ||
+    (dash.status === "fulfilled" && dash.value.data.seo) ||
     [];
   const seoDaily = sortByDateAsc(rawSeoDaily, (r) => r.date);
 
-  const rawAeo = (seo.status === "fulfilled" && seo.value.aeo) || [];
+  const rawAeo = (seo.status === "fulfilled" && seo.value.data.aeo) || [];
   const aeoWeekly = sortByDateAsc(rawAeo, (r) => r.week_start ?? r.week ?? r.date ?? null);
 
-  const rawRanking = (seo.status === "fulfilled" && seo.value.ranking) || [];
+  const rawRanking = (seo.status === "fulfilled" && seo.value.data.ranking) || [];
   const rankingWeekly = sortByDateAsc(rawRanking, (r) => r.week ?? r.date ?? null);
+
+  const kpisDaily = kpis.status === "fulfilled" ? kpis.value.data : [];
+
+  // Aggregate has_seed_data across every successful view + the direct KPIs query.
+  const hasSeedData =
+    (dash.status === "fulfilled" && dash.value.hasSeedData) ||
+    (feeds.status === "fulfilled" && feeds.value.hasSeedData) ||
+    (b2g.status === "fulfilled" && b2g.value.hasSeedData) ||
+    (seo.status === "fulfilled" && seo.value.hasSeedData) ||
+    (kpis.status === "fulfilled" && kpis.value.hasSeedData);
 
   return {
     fetchedAt: new Date().toISOString(),
@@ -189,17 +212,18 @@ export async function fetchDashboardSnapshot(signal?: AbortSignal): Promise<Dash
     aeoWeekly,
     rankingWeekly,
     b2gHot:
-      (dash.status === "fulfilled" && dash.value.b2g_hot) ||
-      (b2g.status === "fulfilled" ? (b2g.value.pipeline ?? []).slice(0, 5) : []),
-    b2gPipeline: (b2g.status === "fulfilled" && b2g.value.pipeline) || [],
-    feedItems: (feeds.status === "fulfilled" && feeds.value.items) || [],
-    sourcesHealth: (dash.status === "fulfilled" && dash.value.sources_health) || [],
-    kpisDaily: kpis.status === "fulfilled" ? kpis.value : [],
+      (dash.status === "fulfilled" && dash.value.data.b2g_hot) ||
+      (b2g.status === "fulfilled" ? (b2g.value.data.pipeline ?? []).slice(0, 5) : []),
+    b2gPipeline: (b2g.status === "fulfilled" && b2g.value.data.pipeline) || [],
+    feedItems: (feeds.status === "fulfilled" && feeds.value.data.items) || [],
+    sourcesHealth: (dash.status === "fulfilled" && dash.value.data.sources_health) || [],
+    kpisDaily,
     viewErrors,
+    hasSeedData: Boolean(hasSeedData),
   };
 }
 
-async function fetchKpisDaily(signal?: AbortSignal): Promise<KpiDailyPoint[]> {
+async function fetchKpisDaily(signal?: AbortSignal): Promise<FetchViewResult<KpiDailyPoint[]>> {
   // Last ~12 months of daily KPIs for sparklines + delta computations.
   const since = new Date();
   since.setUTCDate(since.getUTCDate() - 400);
@@ -211,7 +235,11 @@ async function fetchKpisDaily(signal?: AbortSignal): Promise<KpiDailyPoint[]> {
     .order("date", { ascending: true })
     .abortSignal(signal as AbortSignal);
   if (error) throw error;
-  return (data ?? []) as KpiDailyPoint[];
+  const rows = (data ?? []) as KpiDailyPoint[];
+  return {
+    data: rows,
+    hasSeedData: rows.some((r) => (r as { is_seed?: boolean }).is_seed === true),
+  };
 }
 
 // ---------- Field accessors (handle naming variants) ----------

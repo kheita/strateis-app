@@ -2,6 +2,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+function containsSeedRow(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.some((item) => containsSeedRow(item));
+  }
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    if (obj.is_seed === true) return true;
+    return Object.values(obj).some((v) => containsSeedRow(v));
+  }
+  return false;
+}
+
 serve(async (req) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
@@ -96,7 +108,18 @@ serve(async (req) => {
         });
     }
 
-    return new Response(JSON.stringify({ view, data, fetched_at: new Date().toISOString() }), {
+    const fetchedAt = new Date().toISOString();
+    const hasSeedData = containsSeedRow(data);
+
+    return new Response(JSON.stringify({
+      view,
+      data,
+      meta: {
+        fetched_at: fetchedAt,
+        has_seed_data: hasSeedData,
+      },
+      fetched_at: fetchedAt,
+    }), {
       status: 200,
       headers: {
         ...corsHeaders,

@@ -37,7 +37,7 @@ export function IntelligenceDashboardPage() {
     document.title = "Strateis App — Dashboard";
   }, []);
 
-  const { snapshot, loading, refreshing, error, partialError, lastSync, refresh } =
+  const { snapshot, loading, refreshing, error, partialError, lastSync, refresh, hasSeedData } =
     useDashboardData();
 
   const kpis = useMemo(() => buildKpis(snapshot), [snapshot]);
@@ -47,8 +47,19 @@ export function IntelligenceDashboardPage() {
       <div className="mx-auto max-w-[1440px] px-5 pb-12 pt-6 sm:px-8 sm:pt-8">
         <header className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
           <div>
-            <div className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-tertiary">
-              Intelligence
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-tertiary">
+                Intelligence
+              </span>
+              {hasSeedData && (
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-sm border border-gold-400/40 bg-gold-400/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-gold"
+                  title="Des données de travail (seed) sont affichées. Elles disparaîtront au câblage des collecteurs live."
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+                  Données de travail
+                </span>
+              )}
             </div>
             <h1 className="mt-1 text-[24px] font-medium tracking-[-0.02em] text-primary sm:text-[26px]">
               Dashboard

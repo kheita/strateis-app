@@ -75,7 +75,11 @@ export function useDashboardData() {
 
   const refresh = useCallback(() => void load(false), [load]);
 
-  return { ...state, refresh };
+  return {
+    ...state,
+    refresh,
+    hasSeedData: state.snapshot?.hasSeedData ?? false,
+  };
 }
 
 function formatGlobalError(errors: Record<string, string>): string {
