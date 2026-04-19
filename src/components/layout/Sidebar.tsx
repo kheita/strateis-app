@@ -12,7 +12,7 @@ import { NAVIGATION, type NavSection, type NavModule } from "../../config/naviga
 import { useAuth } from "../../contexts/AuthContext";
 import { Logo, LogoMark } from "../brand/Logo";
 import { Tooltip } from "../common/Tooltip";
-import { Kbd, getModKeyLabel } from "../common/Kbd";
+import { getModKeyLabel } from "../common/Kbd";
 import { ShortcutsModal } from "../help/ShortcutsModal";
 import { cn } from "../../lib/cn";
 
@@ -36,7 +36,41 @@ export function Sidebar({ collapsed, onToggleCollapse }: Props) {
         )}
       >
         {collapsed ? <LogoMark size={26} /> : <Logo size={26} />}
+        {!collapsed && (
+          <Tooltip
+            label="Replier la sidebar"
+            side="bottom"
+            shortcut={`${getModKeyLabel()} \\`}
+          >
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              aria-label="Replier la sidebar"
+              className="hover:surface-subtle text-muted hover:text-secondary flex h-6 w-6 items-center justify-center rounded transition-base"
+            >
+              <PanelLeftClose size={13} strokeWidth={1.75} />
+            </button>
+          </Tooltip>
+        )}
       </div>
+      {collapsed && (
+        <div className="flex justify-center border-b border-subtle py-1.5">
+          <Tooltip
+            label="Déployer la sidebar"
+            side="right"
+            shortcut={`${getModKeyLabel()} \\`}
+          >
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              aria-label="Déployer la sidebar"
+              className="hover:surface-subtle text-muted hover:text-secondary flex h-6 w-6 items-center justify-center rounded transition-base"
+            >
+              <PanelLeftOpen size={13} strokeWidth={1.75} />
+            </button>
+          </Tooltip>
+        </div>
+      )}
 
       <nav className="flex-1 overflow-y-auto py-3">
         {NAVIGATION.map((section) => (
@@ -44,7 +78,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: Props) {
         ))}
       </nav>
 
-      <SidebarFooter collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
+      <SidebarFooter collapsed={collapsed} />
     </aside>
   );
 }
@@ -163,13 +197,7 @@ function SidebarItem({ module, collapsed }: { module: NavModule; collapsed: bool
   return link;
 }
 
-function SidebarFooter({
-  collapsed,
-  onToggleCollapse,
-}: {
-  collapsed: boolean;
-  onToggleCollapse: () => void;
-}) {
+function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   const { user, signOut } = useAuth();
   const [helpOpen, setHelpOpen] = useState(false);
   const email = user?.email ?? "";
@@ -247,12 +275,12 @@ function SidebarFooter({
         </div>
       </div>
 
-      {/* Group 2: Account */}
+      {/* Group 2: Identity */}
       <div className="border-subtle border-t px-2 py-2">
         <div
           className={cn(
             "flex items-center gap-2.5",
-            collapsed ? "flex-col" : "px-1.5 py-1",
+            collapsed ? "justify-center" : "px-1.5 py-1",
           )}
         >
           <Tooltip label={email || "Compte"} side="right">
@@ -268,54 +296,42 @@ function SidebarFooter({
               </div>
             </div>
           )}
-          <Tooltip label="Se déconnecter" side={collapsed ? "right" : "top"}>
-            <button
-              type="button"
-              onClick={signOut}
-              aria-label="Se déconnecter"
-              className="hover:surface-subtle text-tertiary hover:text-primary rounded-md p-1.5 transition-base"
-            >
-              <LogOut size={13} strokeWidth={1.75} />
-            </button>
-          </Tooltip>
         </div>
       </div>
 
-      {/* Group 3: Bottom row — ⌘K hint + discrete collapse chevron */}
-      <div
-        className={cn(
-          "border-subtle flex items-center border-t",
-          collapsed ? "justify-center px-2 py-1.5" : "justify-between px-3 py-1.5",
-        )}
-      >
-        {!collapsed && (
-          <div className="flex items-center">
-            <Kbd className="mr-1">{getModKeyLabel()}</Kbd>
-            <Kbd>K</Kbd>
-            <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-              Recherche
-            </span>
-          </div>
-        )}
-        <Tooltip
-          label={collapsed ? "Déployer la sidebar" : "Replier la sidebar"}
-          side={collapsed ? "right" : "top"}
-          shortcut={`${getModKeyLabel()} \\`}
-        >
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            aria-label={collapsed ? "Déployer la sidebar" : "Replier la sidebar"}
-            className="hover:surface-subtle text-muted hover:text-secondary flex h-6 w-6 items-center justify-center rounded transition-base"
-          >
-            {collapsed ? (
-              <PanelLeftOpen size={13} strokeWidth={1.75} />
-            ) : (
-              <PanelLeftClose size={13} strokeWidth={1.75} />
-            )}
-          </button>
-        </Tooltip>
+      {/* Group 3: Logout — last visible element */}
+      <div className="border-subtle border-t px-2 py-2">
+        <div className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
+          {collapsed ? (
+            <Tooltip label="Se déconnecter" side="right">
+              {logoutButton(signOut, true)}
+            </Tooltip>
+          ) : (
+            logoutButton(signOut, false)
+          )}
+        </div>
       </div>
     </>
+  );
+}
+
+function logoutButton(onClick: () => void, collapsed: boolean) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Se déconnecter"
+      className={cn(
+        "group hover:surface-subtle flex w-full items-center gap-2.5 rounded-md text-[12px] text-secondary transition-base hover:text-primary",
+        collapsed ? "h-9 w-9 justify-center" : "px-2.5 py-1.5",
+      )}
+    >
+      <LogOut
+        size={14}
+        strokeWidth={1.6}
+        className="text-tertiary group-hover:text-secondary shrink-0"
+      />
+      {!collapsed && <span>Se déconnecter</span>}
+    </button>
   );
 }
